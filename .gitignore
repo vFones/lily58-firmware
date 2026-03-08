@@ -1,0 +1,16 @@
+# cloned build environment (created by setup.sh)
+vial-qmk/
+
+# compiled firmware
+*.uf2
+*.hex
+*.bin
+*.eep
+
+# macOS
+.DS_Store
+
+# editors
+.vscode/
+*.swp
+*~

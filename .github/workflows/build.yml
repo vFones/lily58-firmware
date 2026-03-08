@@ -1,0 +1,46 @@
+name: Build Firmware
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout keymap repo
+        uses: actions/checkout@v4
+        with:
+          path: lily58-config
+
+      - name: Clone vial-qmk
+        run: git clone --depth 1 https://github.com/vial-kb/vial-qmk.git
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q \
+            gcc-arm-none-eabi \
+            binutils-arm-none-eabi \
+            python3 \
+            python3-pip
+          pip3 install qmk
+
+      - name: Initialise QMK submodules
+        run: make -C vial-qmk git-submodule
+
+      - name: Copy board definition and keymap into vial-qmk
+        run: cp -r lily58-config/keyboards/lily58/khor vial-qmk/keyboards/lily58/khor
+
+      - name: Build firmware
+        run: make -C vial-qmk lily58/khor:atom
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lily58-atom-${{ github.sha }}
+          path: vial-qmk/lily58_khor_atom.uf2
+          if-no-files-found: error

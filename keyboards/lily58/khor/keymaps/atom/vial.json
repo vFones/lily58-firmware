@@ -1,0 +1,10 @@
+{
+    "name": "Lily58 PRO V2",
+    "vendorId": "0x04D8",
+    "productId": "0xEB2D",
+    "matrix": { "rows": 10, "cols": 6 },
+    "layouts": {
+      "labels": [],
+      "keymap": []
+    }
+  }
