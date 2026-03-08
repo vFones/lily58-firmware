@@ -10,7 +10,7 @@ Personal [Vial](https://get.vial.today/) keymap for the **Lily58 PRO V2** runnin
 
 | Component | Detail |
 |-----------|--------|
-| Keyboard | Lily58 PRO V2 |
+| Keyboard | [Lily58 PRO V2](https://khor.store/products/lily58pro-2-0) (Khor Store) |
 | MCU | RP2040 (Raspberry Pi Pico) |
 | Split transport | Full-duplex serial — TX: GP0, RX: GP1 |
 | Display | SSD1306 OLED (128×32, 270° rotation) |
