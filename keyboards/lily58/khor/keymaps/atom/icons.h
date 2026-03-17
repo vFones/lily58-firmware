@@ -1,9 +1,9 @@
 #pragma once
 #include QMK_KEYBOARD_H
 
-#define MUTE_ANIM_MS      220   // delay between swaps (slower)
-#define MUTE_ANIM_FRAMES  8     // number of swaps total
-#define MUTE_ANIM_HOLD_MS 800   // hold final frame before releasing (optional)
+#define ICON_FRAME_MS 200
+#define ICON_FRAMES   7
+#define ICON_HOLD_MS  400
 #define OLED_FRAME_BYTES (OLED_DISPLAY_WIDTH * (OLED_DISPLAY_HEIGHT / 8))
 
 void oled_anim_release(void);

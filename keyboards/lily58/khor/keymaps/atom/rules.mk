@@ -10,9 +10,11 @@ COMBO_ENABLE = no
 GRAVE_ESC_ENABLE = yes
 KEY_OVERRIDE_ENABLE = no
 VIALRGB_ENABLE = no
-NKRO_ENABLE = yes
+NKRO_ENABLE = no
 LTO_ENABLE = yes
 SPLIT_KEYBOARD = yes
+SLEEP_LED_ENABLE  = no
+NO_USB_STARTUP_CHECK = yes
 
 # If you want to change the display of OLED, you need to change here
 SRC +=  oled_glitch.c \

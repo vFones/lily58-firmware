@@ -709,23 +709,20 @@ typedef struct {
     char step;
     uint16_t timer;
 
-    const char *a_P;
-    const char *b_P;
+    const char *a;
+    const char *b;
 
     uint16_t frame_ms;    // delay between swaps
     char frames;       // number of swaps
     uint16_t hold_ms;     // hold final frame
 
     bool single;
-    const char *single_P;
+    const char *icon;
     bool wait_release;
     bool key_down;
 } oled_swap_anim_t;
 
 static oled_swap_anim_t swap_anim = {0};
-static const uint16_t ICON_FRAME_MS = 160;
-static const char ICON_FRAMES = 3;
-static const uint16_t ICON_HOLD_MS = 300;
 
 void oled_anim_release(void) {
     if (!swap_anim.active) return;
@@ -739,37 +736,37 @@ void oled_anim_release(void) {
     }
 }
 
-static inline void oled_draw_raw_P(const char *img_P) {
+static inline void oled_draw_raw(const char *img) {
     oled_clear();
-    oled_write_raw_P(img_P, OLED_FRAME_BYTES);
+    oled_write_raw_P(img, OLED_FRAME_BYTES);
     oled_render_dirty(true);
 }
 
-void oled_hold_image_start_P(const char *icon_P, uint16_t duration_ms) {
+void oled_hold_image_start(const char *icon, uint16_t duration_ms) {
     swap_anim.active   = true;
     swap_anim.single   = true;
-    swap_anim.single_P = icon_P;
+    swap_anim.icon     = icon;
 
     swap_anim.hold_ms  = duration_ms;
 
     swap_anim.key_down     = true;
     swap_anim.wait_release = true;
 
-    oled_draw_raw_P(icon_P);
+    oled_draw_raw(icon);
 }
 
-void oled_swap_anim_start_P(const char *icon_a_P,
-                            const char *icon_b_P,
-                            uint16_t frame_ms,
-                            char frames,
-                            uint16_t hold_ms) {
+void oled_swap_anim_start(const char *icon_a,
+                          const char *icon_b,
+                          uint16_t frame_ms,
+                          char frames,
+                          uint16_t hold_ms) {
     swap_anim.single   = false;
     swap_anim.active   = true;
     swap_anim.holding  = false;
     swap_anim.step     = 0;
 
-    swap_anim.a_P      = icon_a_P;
-    swap_anim.b_P      = icon_b_P;
+    swap_anim.a        = icon_a;
+    swap_anim.b        = icon_b;
 
     swap_anim.frame_ms = frame_ms;
     swap_anim.frames   = frames;
@@ -778,7 +775,7 @@ void oled_swap_anim_start_P(const char *icon_a_P,
     swap_anim.key_down     = true;
     swap_anim.wait_release = true;
 
-    oled_draw_raw_P(icon_b_P);
+    oled_draw_raw(icon_b);
 }
 
 // Call from oled_task_user(); returns true if animation is occupying the OLED
@@ -798,8 +795,8 @@ bool oled_swap_anim_task(void) {
     swap_anim.timer = timer_read();
 
     if (!swap_anim.holding) {
-        const char *img = (swap_anim.step & 1) ? swap_anim.a_P : swap_anim.b_P;
-        oled_draw_raw_P(img);
+        const char *img = (swap_anim.step & 1) ? swap_anim.a : swap_anim.b;
+        oled_draw_raw(img);
 
         swap_anim.step++;
         if (swap_anim.step >= swap_anim.frames) {
@@ -813,67 +810,67 @@ bool oled_swap_anim_task(void) {
 }
 
 void render_mute_animation(void) {
-    oled_swap_anim_start_P(volume_on, mute_icon, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
+    oled_swap_anim_start(volume_on, mute_icon, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
 }
 
 void render_pause_animation(void) {
-    oled_swap_anim_start_P(play, pause, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
+    oled_swap_anim_start(play, pause, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
 }
 
 void render_forward_animation(void) {
-    oled_swap_anim_start_P(skip_forward, step_forward, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
+    oled_swap_anim_start(skip_forward, step_forward, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
 }
 
 void render_back_animation(void) {
-    oled_swap_anim_start_P(skip_back, step_back, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
+    oled_swap_anim_start(skip_back, step_back, ICON_FRAME_MS, ICON_FRAMES, ICON_HOLD_MS*2);
 }
 
 void render_raise_icon(void) {
-    oled_hold_image_start_P(chevron_up, ICON_HOLD_MS);
+    oled_hold_image_start(chevron_up, ICON_HOLD_MS);
 }
 
 void render_raise2_icon(void) {
-    oled_hold_image_start_P(chevrons_up, ICON_HOLD_MS);
+    oled_hold_image_start(chevrons_up, ICON_HOLD_MS);
 }
 
 void render_arrow_up_icon(void) {
-    oled_hold_image_start_P(arrow_up, ICON_HOLD_MS);
+    oled_hold_image_start(arrow_up, ICON_HOLD_MS);
 }
 
 void render_arrow_down_icon(void) {
-    oled_hold_image_start_P(arrow_down, ICON_HOLD_MS);
+    oled_hold_image_start(arrow_down, ICON_HOLD_MS);
 }
 
 void render_arrow_left_icon(void) {
-    oled_hold_image_start_P(arrow_left, ICON_HOLD_MS);
+    oled_hold_image_start(arrow_left, ICON_HOLD_MS);
 }
 
 void render_arrow_right_icon(void) {
-    oled_hold_image_start_P(arrow_right, ICON_HOLD_MS);
+    oled_hold_image_start(arrow_right, ICON_HOLD_MS);
 }
 
 void render_home_icon(void) {
-    oled_hold_image_start_P(list_start, ICON_HOLD_MS);
+    oled_hold_image_start(list_start, ICON_HOLD_MS);
 }
 
 void render_end_icon(void) {
-    oled_hold_image_start_P(list_end, ICON_HOLD_MS);
+    oled_hold_image_start(list_end, ICON_HOLD_MS);
 }
 
 void render_page_up_icon(void) {
-    oled_hold_image_start_P(arrow_up_narrow_wide, ICON_HOLD_MS);
+    oled_hold_image_start(arrow_up_narrow_wide, ICON_HOLD_MS);
 }
 
 void render_page_down_icon(void) {
-    oled_hold_image_start_P(arrow_down_wide_narrow, ICON_HOLD_MS);
+    oled_hold_image_start(arrow_down_wide_narrow, ICON_HOLD_MS);
 }
 
 void render_f13_icon(void) {
-	oled_hold_image_start_P(F13, ICON_HOLD_MS);
+	oled_hold_image_start(F13, ICON_HOLD_MS);
 }
 
 void render_f14_icon(void) {
-	oled_hold_image_start_P(F14, ICON_HOLD_MS);
+	oled_hold_image_start(F14, ICON_HOLD_MS);
 }
 
 static const char PROGMEM atom_logo[] = {
