@@ -80,13 +80,11 @@ pip3 install qmk
                   `----------------------------'           '------''--------------------'
 ```
 
-`ESC` is `QK_GESC` — sends `~` when held with Shift, `ESC` otherwise.
-
 ### Layer 1 — RAISE (function / navigation / media)
 
 ```
 ,-----------------------------------------.                    ,-----------------------------------------.
-| NUBS |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
+|  `   |  F1  |  F2  |  F3  |  F4  |  F5  |                    |  F6  |  F7  |  F8  |  F9  | F10  | F11  |
 |------+------+------+------+------+------|                    |------+------+------+------+------+------|
 |      |      |      |      |      |      |                    |      |      | Prev | Next | Play | F12  |
 |------+------+------+------+------+------|                    |------+------+------+------+------+------|
@@ -124,7 +122,6 @@ Reached by holding `RAISE`, then holding `RAISE2` (the RGUI key on base layer).
 |-----|-----------|
 | `LRAISE` | Momentary `_RAISE` — left-side thumb key version of `RAISE` |
 | `TG_WIN` | Toggle Windows / macOS mode — in Windows mode `LGUI` is remapped to `LCTL` so shortcuts feel native |
-| `QK_GESC` | `ESC` normally, `~` when Shift is held |
 | `QK_BOOT` | Enter RP2040 bootloader after a 3-second OLED countdown (any key cancels) |
 | `QK_REBOOT` | Soft-reboot the firmware |
 
@@ -164,7 +161,7 @@ Icons are stored as 16-bit OLED bitmap arrays and rendered with an optional **gl
 | Vial | ✅ | Full runtime remapping via Vial GUI |
 | NKRO | ✅ | N-key rollover |
 | Extra keys | ✅ | Media / system keys |
-| Grave ESC | ✅ | `ESC` / `~` combo key |
+| Grave ESC | ❌ | |
 | WPM | ❌ | |
 | LTO | ✅ | Link-time optimisation — smaller firmware |
 | Split transport mirror | ✅ | Layer state, LED state, mods, OLED synced |
