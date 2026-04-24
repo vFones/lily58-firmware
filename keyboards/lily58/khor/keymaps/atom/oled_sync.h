@@ -35,3 +35,7 @@ void run_pending_oled_events(void);
 const oled_key_event_binding_t *find_oled_key_event_binding(uint16_t keycode);
 void oled_sync_dispatch_press(enum oled_event event, bool right_side);
 void oled_sync_dispatch_release(enum oled_event event);
+
+typedef void (*clock_sync_handler_t)(uint16_t total_s);
+void oled_sync_register_clock_handler(clock_sync_handler_t handler);
+void oled_sync_send_clock(uint16_t total_s);

@@ -4,10 +4,12 @@
 #include "oled_glitch.h"
 #include "icons.h"
 #include "oled_sync.h"
+#include "oled_clock.h"
 
 #define RAISE MO(_RAISE)
 #define RAISETWO MO(_RAISETWO)
 #define BOOT_CONFIRM_TIME 3000
+#define CLOCK_OLED_TIMEOUT 60000
 #define USER_ANIM_SYNC_ID ANIM_SYNC
 
 static bool is_windows = false;
@@ -15,7 +17,30 @@ static bool boot_pending = false;
 static uint16_t boot_timer = 0;
 static uint8_t boot_seconds_left = 3;
 static uint16_t boot_second_timer = 0;
-static uint8_t oled_last_layer = 0xFF;
+
+#define CMD_TIME_SYNC 0x54  // 'T', outside VIA (0x01-0x13) and Vial (0xFE) ranges
+static bool     clock_synced  = false;
+static uint8_t  clock_h = 0, clock_m = 0, clock_s = 0;
+static uint32_t clock_base_ms = 0;
+static uint8_t  clock_last_s  = 0xFF;
+
+static void on_clock_sync_slave(uint16_t total_min) {
+    clock_h       = (uint8_t)(total_min / 60);
+    clock_m       = (uint8_t)(total_min % 60);
+    clock_s       = 0;
+    clock_base_ms = timer_read32();
+    clock_synced  = true;
+}
+
+void raw_hid_receive_kb(uint8_t *data, uint8_t length) {
+    if (length < 4 || data[0] != CMD_TIME_SYNC) return;
+    clock_h       = data[1] % 24;
+    clock_m       = data[2] % 60;
+    clock_s       = data[3] % 60;
+    clock_base_ms = timer_read32();
+    clock_synced  = true;
+    oled_sync_send_clock((uint16_t)clock_h * 60 + clock_m);
+}
 
 enum layer_number {
   _QWERTY = 0,
@@ -121,6 +146,7 @@ static const oled_key_event_binding_t oled_key_event_bindings[] = {
 
 void keyboard_post_init_user(void) {
     oled_sync_init(USER_ANIM_SYNC_ID, oled_key_event_bindings, ARRAY_SIZE(oled_key_event_bindings));
+    oled_sync_register_clock_handler(on_clock_sync_slave);
 }
 
 static const char PROGMEM big_digits[4][5][5] = {
@@ -186,24 +212,37 @@ void oled_render_boot_pending(uint8_t seconds) {
 }
 
 bool oled_task_user(void) {
-    if (boot_pending) {
-        return false;
-    }
+    if (boot_pending) return false;
 
     run_pending_oled_events();
 
     if (oled_swap_anim_task()) {
+        clock_last_s = 0xFF;
         return false;
     }
-    uint8_t current_layer = get_highest_layer(layer_state);
 
-    if (current_layer != oled_last_layer) {
-        oled_clear();
-        oled_last_layer = current_layer;
+    if (clock_synced) {
+        if (last_input_activity_elapsed() > CLOCK_OLED_TIMEOUT) {
+            render_atom_logo_full();
+            clock_last_s = 0xFF;
+            return false;
+        }
+
+        uint32_t total_s = ((uint32_t)clock_h * 3600 + (uint32_t)clock_m * 60 + clock_s + (timer_read32() - clock_base_ms) / 1000) % 86400;
+        uint8_t  cs      = (uint8_t)(total_s % 60);
+        if (cs != clock_last_s) {
+            clock_last_s    = cs;
+            uint8_t cur_h   = (uint8_t)(total_s / 3600);
+            uint8_t cur_m   = (uint8_t)((total_s % 3600) / 60);
+            render_clock(cur_h, cur_m, cs % 2 == 0);
+            if (is_keyboard_master() && cs == 0) {
+                oled_sync_send_clock((uint16_t)cur_h * 60 + cur_m);
+            }
+        }
+        return false;
     }
 
     render_atom_logo_full();
-
     return false;
 }
 

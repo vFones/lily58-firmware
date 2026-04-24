@@ -20,4 +20,5 @@ NO_USB_STARTUP_CHECK = yes
 SRC +=  oled_glitch.c \
         icons.c \
         oled_sync.c \
-        user_transport.c
+        user_transport.c \
+        oled_clock.c

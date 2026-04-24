@@ -6,6 +6,7 @@ enum sync_cmd {
     SYNC_CMD_OLED_EVENT = 0,
     SYNC_CMD_OLED_RELEASE,
     SYNC_CMD_PAUSE_SCROLL,
+    SYNC_CMD_CLOCK,
 };
 
 typedef struct {
@@ -18,6 +19,7 @@ static uint8_t sync_transaction_id = 0;
 static bool oled_event_pending[OLED_EVENT_COUNT] = {0};
 static const oled_key_event_binding_t *sync_bindings = NULL;
 static uint8_t sync_bindings_count = 0;
+static clock_sync_handler_t g_clock_handler = NULL;
 
 static void sync_send(uint8_t cmd, uint16_t data) {
     sync_packet_t packet = {
@@ -85,9 +87,20 @@ static void handle_transport_data(const void *data, uint8_t size) {
         case SYNC_CMD_PAUSE_SCROLL:
             pause_logo_scroll(payload);
             return;
+        case SYNC_CMD_CLOCK:
+            if (g_clock_handler) g_clock_handler(payload);
+            return;
         default:
             return;
     }
+}
+
+void oled_sync_register_clock_handler(clock_sync_handler_t handler) {
+    g_clock_handler = handler;
+}
+
+void oled_sync_send_clock(uint16_t total_s) {
+    sync_send(SYNC_CMD_CLOCK, total_s);
 }
 
 void oled_sync_init(uint8_t sync_id, const oled_key_event_binding_t *bindings, uint8_t count) {
