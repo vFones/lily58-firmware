@@ -12,7 +12,6 @@
 #define CLOCK_OLED_TIMEOUT 60000
 #define USER_ANIM_SYNC_ID ANIM_SYNC
 
-static bool is_windows = false;
 static bool boot_pending = false;
 static uint16_t boot_timer = 0;
 static uint8_t boot_seconds_left = 3;
@@ -50,7 +49,6 @@ enum layer_number {
 
 enum custom_keycodes {
     LRAISE = SAFE_RANGE,
-    TG_WIN
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -82,20 +80,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |      |      |      |      |      |      |                    |      |      | Prev | Next | Play | F12  |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |TgWin |      |      |      |      |      |-------.    ,-------| Left | Down |  Up  |Right |      | F13  |
+ * |      |      |      |      |      |      |-------.    ,-------| Left | Down |  Up  |Right |      | F13  |
  * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
  * |      | Prev | Next | Play | Mute |      |-------|    |-------| End  | PgDn | PgUp | Home |  \   | F14  |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |      |TgWin |      | /       /       \      \  | Del  |RAISE2|      |
+ *                   |      |      |      | /       /       \      \  | Del  |RAISE2|      |
  *                   |      |      |      |/       /         \      \ |      |      |      |
  *                   `----------------------------'           '------''--------------------'
  */
     [_RAISE] = LAYOUT(
       KC_GRV,   KC_F1,      KC_F2,      KC_F3,      KC_F4,      KC_F5,                                      KC_F6,      KC_F7,      KC_F8,      KC_F9,   KC_F10,    KC_F11,
       _______,  _______,    _______,    _______,    _______,    _______,                                    _______,    _______,    KC_MPRV,    KC_MNXT, KC_MPLY,   KC_F12,
-      TG_WIN,   _______,    _______,    _______,    _______,    _______,                                    KC_LEFT,    KC_DOWN,    KC_UP,      KC_RGHT, _______,   KC_F13,
+      _______,  _______,    _______,    _______,    _______,    _______,                                    KC_LEFT,    KC_DOWN,    KC_UP,      KC_RGHT, _______,   KC_F13,
       _______,  KC_MPRV,    KC_MNXT,    KC_MPLY,    KC_MUTE,    _______, _______,               _______,    KC_END,     KC_PGDN,    KC_PGUP,    KC_HOME, KC_BACKSLASH, KC_F14,
-                                    _______,  TG_WIN,   _______,         _______,               _______,        KC_DELETE,  RAISETWO,   _______
+                                    _______,  _______,  _______,         _______,               _______,        KC_DELETE,  RAISETWO,   _______
     ),
 /* RAISETWO
  * ,-----------------------------------------.                    ,-----------------------------------------.
@@ -268,21 +266,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
     switch (keycode) {
-        case KC_LGUI:
-            if (is_windows) {
-                if (record->event.pressed) {
-                    register_code(KC_LCTL);
-                } else {
-                    unregister_code(KC_LCTL);
-                }
-                return false;
-            }
-            return true;
-        case TG_WIN:
-            if (record->event.pressed) {
-                is_windows = !is_windows;
-            }
-            return false;
         case QK_BOOT:
             if (record->event.pressed) {
                 boot_pending = true;
