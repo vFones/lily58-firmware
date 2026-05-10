@@ -61,17 +61,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |LCTRL |   A  |   S  |   D  |   F  |   G  |-------.    ,-------|   H  |   J  |   K  |   L  |   ;  |   '  |
  * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
- * |LShift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |RCTRL |
+ * |LShift|   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |  ,|. |  \  |   /  | RCTRL |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   |LAlt  | LGUI |LRAISE | /Space  /       \Enter \  |BkSp  | RGUI |RAISE |
- *                   |      |      |      |/       /         \      \ |      |      |      |
+ *                   |LAlt  | LGUI |LRAISE| /Space  /       \Enter \  | BkSp | RAISE | RGUI |
+ *                   |      |      |      |/       /         \      \ |      |      |       |
  *                   `----------------------------'           '------''--------------------'
  */
     [_QWERTY] = LAYOUT(
-      KC_ESC,      KC_1,   KC_2,   KC_3,   KC_4,   KC_5,                               KC_6,   KC_7,   KC_8,       KC_9,   KC_0,       KC_EQUAL,
-      KC_TAB,       KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,                               KC_Y,   KC_U,   KC_I,       KC_O,   KC_P,       KC_MINS,
-      KC_LCTL,      KC_A,   KC_S,   KC_D,   KC_F,   KC_G,                               KC_H,   KC_J,   KC_K,       KC_L,   KC_SCLN,    KC_QUOT,
-      KC_LSFT,      KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_LBRC,        KC_RBRC,    KC_N,   KC_M,   KC_COMM,    KC_DOT, KC_SLSH,    KC_RCTL,
+      TD(1),        KC_1,   KC_2,   KC_3,   KC_4,   KC_5,                               KC_6,   KC_7,   KC_8,       KC_9,           KC_0,       KC_EQUAL,
+      KC_TAB,       KC_Q,   KC_W,   KC_E,   KC_R,   KC_T,                               KC_Y,   KC_U,   KC_I,       KC_O,           KC_P,       KC_MINS,
+      KC_LCTL,      KC_A,   KC_S,   KC_D,   KC_F,   KC_G,                               KC_H,   KC_J,   KC_K,       KC_L,           KC_SCLN,    KC_QUOT,
+      KC_LSFT,      KC_Z,   KC_X,   KC_C,   KC_V,   KC_B,   KC_LBRC,        KC_RBRC,    KC_N,   KC_M,   TD(0),      KC_BACKSLASH,   KC_SLSH,    KC_RCTL,
                                 KC_LALT, KC_LGUI, LRAISE,    KC_SPC,         KC_ENT,      KC_BSPC, KC_RGUI, RAISE
     ),
 /* RAISE
@@ -82,7 +82,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |      |      |      |      |      |      |-------.    ,-------| Left | Down |  Up  |Right |      | F13  |
  * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * |      | Prev | Next | Play | Mute |      |-------|    |-------| End  | PgDn | PgUp | Home |  \   | F14  |
+ * |      | Prev | Next | Play | Mute |      |-------|    |-------| End  | PgDn | PgUp | Home |      | F14  |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *                   |      |      |      | /       /       \      \  | Del  |RAISE2|      |
  *                   |      |      |      |/       /         \      \ |      |      |      |
@@ -111,9 +111,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [_RAISETWO] = LAYOUT(
       QK_BOOT,      _______, _______, _______, _______, _______,                                       _______, _______, _______, _______, _______, _______,
-      QK_REBOOT,    _______, _______, _______, _______, _______,                                       _______, _______, _______, _______, _______, _______,
-      _______,      _______, _______, _______, _______, _______,                                       _______, _______, _______, _______, _______, _______,
-      _______,      _______, _______, _______, _______, _______,    _______,               _______,    _______, _______, _______, _______, _______, _______,
+      QK_REBOOT,    _______, _______, _______, _______, _______,                                       MS_WHLL, MS_WHLU, MS_WHLD, MS_WHLR, _______, _______,
+      _______,      _______, _______, _______, _______, _______,                                       MS_LEFT, MS_DOWN, MS_UP,   MS_RGHT, _______, _______,
+      _______,      _______, _______, _______, _______, _______,    _______,               MS_BTN1,    MS_BTN2, _______, _______, _______, _______, _______,
                                 _______, _______, _______,          _______,               _______,         _______, _______, _______
     )
 };
@@ -145,6 +145,19 @@ static const oled_key_event_binding_t oled_key_event_bindings[] = {
 void keyboard_post_init_user(void) {
     oled_sync_init(USER_ANIM_SYNC_ID, oled_key_event_bindings, ARRAY_SIZE(oled_key_event_bindings));
     oled_sync_register_clock_handler(on_clock_sync_slave);
+    vial_tap_dance_entry_t td0 = { KC_COMM,
+                                   0,
+                                   KC_DOT, // double tap
+                                   0,
+                                   TAPPING_TERM };
+    vial_tap_dance_entry_t td1 = { KC_ESC,
+                                   RAISETWO, // on hold
+                                   0,
+                                   0,
+                                   TAPPING_TERM };                         
+    dynamic_keymap_set_tap_dance(0, &td0);
+    dynamic_keymap_set_tap_dance(1, &td1);
+    
 }
 
 static const char PROGMEM big_digits[4][5][5] = {
